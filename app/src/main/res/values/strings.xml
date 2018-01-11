@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ShareDemo</string>
+
+
+    <string name="friend_detail_black_friend_title">屏蔽该好友</string>
+    <string name="friend_detail_black_friend_text">打开后，将无法收到该好友发送的消息</string>
+    <string name="friend_detail_see_phone">手机号对好友可见</string>
+
+</resources>
