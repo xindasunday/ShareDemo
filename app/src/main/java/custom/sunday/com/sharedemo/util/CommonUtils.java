@@ -451,4 +451,8 @@ public class CommonUtils {
         return (dm.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
+    public static int getSDKInt() {
+        return android.os.Build.VERSION.SDK_INT;
+    }
+
 }

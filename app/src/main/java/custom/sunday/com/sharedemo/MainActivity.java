@@ -1,106 +1,76 @@
 package custom.sunday.com.sharedemo;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
+import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import custom.sunday.com.sharedemo.setting.SettingItem;
-import custom.sunday.com.sharedemo.setting.SettingItemScreen;
-import custom.sunday.com.sharedemo.setting.SettingItemSwitch;
-import custom.sunday.com.sharedemo.setting.SettingItemText;
-import custom.sunday.com.sharedemo.setting.SettingKeyValue;
+import custom.sunday.com.sharedemo.path.PathActivity;
+import custom.sunday.com.sharedemo.setting.SettingItemActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private FriendDetail mFriendDetail;
-    private SettingItemText mNameRemarkSettingItem;
-    private SettingItemScreen mSettingItemScreen;
+    public static final String[] TITLE_ARRAY= {
+            "SharePreference管理",
+            "Path"};
+    public static final Class[] CLASS_ARRAY = {
+            SettingItemActivity.class,
+            PathActivity.class
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //demo使用
-        mFriendDetail = new FriendDetail();
         ListView listView = (ListView) findViewById(R.id.list_view);
-        List<SettingItem> settingItems = new ArrayList<>();
-        mNameRemarkSettingItem = new SettingItemText(
-                "设置备注",
-                "随意填入",
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(MainActivity.this, "点击响应", Toast.LENGTH_SHORT).show();
-                    }
-                }) {
-
+        listView.setAdapter(new BaseAdapter() {
             @Override
-            public void refreshData() {
-                //如果当前summary需要更新，调用
-                mSettingItemScreen.refreshView();
-            }
-        };
-        settingItems.add(mNameRemarkSettingItem);
-        settingItems.add(new SettingItemSwitch(
-                getResources().getString(R.string.friend_detail_black_friend_title),
-                getResources().getString(R.string.friend_detail_black_friend_text),
-                SettingKeyValue.KEY_BOOLEAN_BLACK
-        ) {
-            @Override
-            public void refreshData() {
-                if (isSPUnknow() && mFriendDetail != null) {
-                    setState(mFriendDetail.isBlackFriend());
-                    mSettingItemScreen.refreshView();
-                }
+            public int getCount() {
+                return TITLE_ARRAY.length;
             }
 
             @Override
-            public void syncNetwork() {
-                boolean isBlack = getState();
-                if (mFriendDetail != null && mFriendDetail.isBlackFriend() != isBlack) {
-                    //将isBlack同步到网络
+            public Object getItem(int position) {
+                return TITLE_ARRAY[position];
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = convertView;
+                if(view == null){
+                    view = LayoutInflater.from(HomeApplication.getInstance()).inflate(R.layout.item_main_list,null,false);
+                    Holder holder = new Holder();
+                    holder.titleView = (TextView) view.findViewById(R.id.text_view);
+                    view.setTag(holder);
                 }
+                Holder holder = (Holder) view.getTag();
+                holder.titleView.setText(TITLE_ARRAY[position]);
+                return view;
             }
         });
-        settingItems.add(new SettingItemSwitch(
-                getResources().getString(R.string.friend_detail_see_phone),
-                null,
-                SettingKeyValue.KEY_BOOLEAN_SHOW_NUMBER
-        ) {
-
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void refreshData() {
-                if (mFriendDetail != null && isSPUnknow()) {
-                    setState(mFriendDetail.isPhoneVisible());
-                    mSettingItemScreen.refreshView();
-                }
-            }
-
-            @Override
-            public void syncNetwork() {
-                boolean isVisible = getState();
-                if (mFriendDetail != null && mFriendDetail.isPhoneVisible() != isVisible) {
-                    //将isVisible同步到网络
-                }
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                startActivity(new Intent(MainActivity.this,CLASS_ARRAY[position]));
             }
         });
-        mSettingItemScreen = new SettingItemScreen(listView, settingItems);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mSettingItemScreen.refresh();
+
+    private static final class Holder{
+        TextView titleView;
     }
 
-    @Override
-    protected void onDestroy() {
-        mSettingItemScreen.sync();
-        super.onDestroy();
-    }
 
 }

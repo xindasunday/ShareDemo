@@ -5,4 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="text_color_4a4a4a">#4a4a4a</color>
     <color name="text_color_9b9b9b">#9b9b9b</color>
+    <color name="red">#ff0000</color>
+    <color name="red_transparent_end">#40ff0000</color>
+    <color name="red_transparent_start">#00ff0000</color>
 </resources>
