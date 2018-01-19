@@ -18,5 +18,10 @@ public interface HeaderView {
 
     View getView();
 
+    //刷新成功后暂停几秒用于显示动画效果后，执行Runnable
+    void showPause(boolean success);
 
+    boolean isPauseTime();
+
+    int getDelayMillsTime();
 }

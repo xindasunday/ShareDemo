@@ -59,4 +59,21 @@ public class ClassicsHeaderView implements HeaderView {
         }
         return mParent;
     }
+
+    @Override
+    public void showPause(boolean success) {
+        mFinishView.setVisibility(View.VISIBLE);
+        mLoadingView.setVisibility(View.GONE);
+        mTextView.setText("刷新成功");
+    }
+
+    @Override
+    public boolean isPauseTime() {
+        return mFinishView.getVisibility() == View.VISIBLE;
+    }
+
+    @Override
+    public int getDelayMillsTime() {
+        return 2000;
+    }
 }
