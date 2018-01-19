@@ -128,6 +128,7 @@ public class RefreshLayout extends LinearLayout {
                 float moveY = event.getY() - mLastY;
                 if (isChildTop() && moveY > 0) {
                     //scrollBy(0, (int) -moveY);
+                    mHeaderView.begin();
                     return true;
                 } else if (moveY < 0) {
                     if (isChildBottom() || getScrollY() < mHeadViewHeight) {
@@ -152,10 +153,8 @@ public class RefreshLayout extends LinearLayout {
                 float moveY = event.getY() - mLastY;
                 if (isChildTop() && moveY > 0) {
                     float move = getScrollValue(moveY);
-                    Log.e("sunday","move = " + move);
-                    if(move != 0) {
-                        scrollBy(0, (int) -move);
-                    }
+                    mHeaderView.progress(0.5f);
+                    scrollBy(0, (int) -move);
                 } else if (moveY < 0) {
                     if (isChildBottom() || getScrollY() < mHeadViewHeight) {
                         scrollBy(0, (int) -moveY);
@@ -167,9 +166,15 @@ public class RefreshLayout extends LinearLayout {
             case MotionEvent.ACTION_UP:
                 if (isRefreshStatus()) {
                     if (mRefreshListener != null) {
-                        mScroller.startScroll(0, getScrollY(), 0, -getScrollY(), 500);
-                        postInvalidate();
-                        mRefreshListener.refresh();
+                        if(getScrollY() > 0){
+                            mScroller.startScroll(0, getScrollY(), 0, mHeadViewHeight, 500);
+                            postInvalidate();
+                        }else {
+                            mScroller.startScroll(0, getScrollY(), 0, -getScrollY(), 500);
+                            postInvalidate();
+                            mHeaderView.loading();
+                            mRefreshListener.refresh();
+                        }
                     }
                 } else if (isLoadMoreStatus()) {
                     if (mRefreshListener != null) {
@@ -202,6 +207,7 @@ public class RefreshLayout extends LinearLayout {
 
     public void finishRefresh(boolean success) {
         if (getScrollY() >= 0) {
+            mHeaderView.normal();
             mScroller.startScroll(
                     0,
                     getScrollY(),
@@ -220,14 +226,25 @@ public class RefreshLayout extends LinearLayout {
         this.isFullPull = isFullPull;
     }
 
+
+    //值越大，滑动速度越慢
+    private float  mFiller = 3;
+    public void setMoveFiller(float num){
+        mFiller = num;
+    }
+
+    public float getMoveFiller(){
+        return mFiller;
+    }
+
     private float getScrollValue(float moveY) {
 
         //刷新
         if (isSupportFullPull()) {
-            return moveY / 3;
+            return moveY / mFiller;
         } else {
             if (getScrollY() > 0 || getScrollY() > (mHeadViewHeight-maxPullHeight)) {
-                return moveY / 3;
+                return moveY / mFiller;
             } else {
                 return  0 ;
             }

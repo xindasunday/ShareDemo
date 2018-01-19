@@ -9,12 +9,11 @@ import android.view.View;
 public interface HeaderView {
     void begin();
 
-    void end();
-
     void progress(float progress);
 
     void loading();
 
+    //初始化和结束后调用
     void normal();
 
     View getView();

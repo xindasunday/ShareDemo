@@ -7,7 +7,6 @@
 
     <custom.sunday.com.sharedemo.component.refreshlayout.RefreshLayout
         android:id="@+id/refresh_layout"
-        android:background="#123456"
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="match_parent">
