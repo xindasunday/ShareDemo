@@ -19,8 +19,8 @@
         </activity>
 
         <activity android:name=".base.BaseActivity" />
-        <activity android:name=".setting.SettingItemActivity" />
-        <activity android:name=".path.PathActivity" />
+        <activity android:name=".component.setting.SettingItemActivity" />
+        <activity android:name=".component.path.PathActivity" />
     </application>
 
 </manifest>

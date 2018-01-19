@@ -1,5 +1,4 @@
-package custom.sunday.com.sharedemo.setting;
-
+package custom.sunday.com.sharedemo.component.setting;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -9,7 +8,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-import custom.sunday.com.sharedemo.FriendDetail;
 import custom.sunday.com.sharedemo.R;
 
 public class SettingItemActivity extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package custom.sunday.com.sharedemo.path;
+package custom.sunday.com.sharedemo.component.path;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -10,7 +10,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import custom.sunday.com.sharedemo.R;
-import custom.sunday.com.sharedemo.util.CommonUtils;
+import custom.sunday.com.sharedemo.common.util.CommonUtils;
 
 /**
  * Created by zhongfei.sun on 2018/1/17.

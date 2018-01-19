@@ -1,5 +1,4 @@
-package custom.sunday.com.sharedemo.setting;
-
+package custom.sunday.com.sharedemo.component.setting;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;

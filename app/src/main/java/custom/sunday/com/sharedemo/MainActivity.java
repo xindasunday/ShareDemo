@@ -11,8 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import custom.sunday.com.sharedemo.path.PathActivity;
-import custom.sunday.com.sharedemo.setting.SettingItemActivity;
+import custom.sunday.com.sharedemo.component.path.PathActivity;
+import custom.sunday.com.sharedemo.component.setting.SettingItemActivity;
 
 public class MainActivity extends AppCompatActivity {
     public static final String[] TITLE_ARRAY= {

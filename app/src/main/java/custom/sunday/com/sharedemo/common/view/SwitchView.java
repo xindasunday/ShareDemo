@@ -1,4 +1,4 @@
-package custom.sunday.com.sharedemo.view;
+package custom.sunday.com.sharedemo.common.view;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import custom.sunday.com.sharedemo.R;
-import custom.sunday.com.sharedemo.util.CommonUtils;
+import custom.sunday.com.sharedemo.common.util.CommonUtils;
 
 /***
  * 此View从别处而来...

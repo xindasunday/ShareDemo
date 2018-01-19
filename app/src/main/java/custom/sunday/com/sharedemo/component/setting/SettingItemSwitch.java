@@ -1,4 +1,4 @@
-package custom.sunday.com.sharedemo.setting;
+package custom.sunday.com.sharedemo.component.setting;
 
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import custom.sunday.com.sharedemo.HomeApplication;
 import custom.sunday.com.sharedemo.R;
-import custom.sunday.com.sharedemo.view.SwitchView;
+import custom.sunday.com.sharedemo.common.view.SwitchView;
 
 
 /**

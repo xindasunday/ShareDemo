@@ -1,4 +1,4 @@
-package custom.sunday.com.sharedemo.path;
+package custom.sunday.com.sharedemo.component.path;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

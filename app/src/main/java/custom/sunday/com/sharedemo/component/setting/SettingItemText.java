@@ -1,4 +1,4 @@
-package custom.sunday.com.sharedemo.setting;
+package custom.sunday.com.sharedemo.component.setting;
 
 import android.view.LayoutInflater;
 import android.view.View;

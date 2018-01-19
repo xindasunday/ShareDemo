@@ -1,4 +1,4 @@
-package custom.sunday.com.sharedemo;
+package custom.sunday.com.sharedemo.component.setting;
 
 /**
  * Created by zhongfei.sun on 2018/1/11.

@@ -1,4 +1,4 @@
-package custom.sunday.com.sharedemo.util;
+package custom.sunday.com.sharedemo.common.util;
 
 import android.app.Activity;
 import android.content.Context;
