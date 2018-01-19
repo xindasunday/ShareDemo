@@ -6,7 +6,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 
@@ -16,12 +18,23 @@ import android.widget.Scroller;
 
 public class RefreshLayout extends LinearLayout {
 
+    private HeaderView mHeaderView;
+    private float mLastX;
+    private float mLastY;
+    private int mHeadViewHeight;
+    private int mRootViewHeight;
+    private Scroller mScroller;
+    private RefreshListener mRefreshListener;
+    private int maxPullHeight;
+    private boolean isFullPull = true;
+
     public RefreshLayout(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
+
     public RefreshLayout(Context context, @Nullable AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public RefreshLayout(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -29,31 +42,52 @@ public class RefreshLayout extends LinearLayout {
         init();
     }
 
-    private float mLastX;
-    private float mLastY;
-
-    private int mHeadViewHeight;
-    private Scroller mScroller;
-
-    private void init(){
+    private void init() {
         mScroller = new Scroller(getContext());
+        mHeaderView = new ClassicsHeaderView(getContext());
+        addView(mHeaderView.getView(), 0);
     }
 
+    public void setRefreshListener(RefreshListener refreshListener) {
+        mRefreshListener = refreshListener;
+    }
 
-    private boolean isChildTop(){
+    public void setHeadView(HeaderView headerView) {
+        mHeaderView = headerView;
+        View headView = getChildAt(0);
+        if (headerView != null && headerView instanceof HeaderView) {
+            removeView(headView);
+        }
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-1, -2);
+        this.mHeaderView.getView().setLayoutParams(layoutParams);
+        if (this.mHeaderView.getView().getParent() != null) {
+            ((ViewGroup) this.mHeaderView.getView().getParent()).removeAllViews();
+        }
+        addView(mHeaderView.getView(), 0);
+    }
+
+    private boolean isChildTop() {
         View child = getChildAt(1);
-        if(child instanceof AbsListView){
+        if (child instanceof AbsListView) {
             AbsListView listView = (AbsListView) child;
-            if(listView.getFirstVisiblePosition()==0){
-                 View topChildView = listView.getChildAt(0);
-                return topChildView.getTop()== 0;
+            if (listView.getFirstVisiblePosition() == 0) {
+                View topChildView = listView.getChildAt(0);
+                return topChildView.getTop() == 0;
             }
         }
         return false;
     }
 
-    private boolean isChildBottom(){
+    private boolean isChildBottom() {
         return false;
+    }
+
+    public boolean isRefreshStatus() {
+        return isChildTop();
+    }
+
+    public boolean isLoadMoreStatus() {
+        return isChildBottom();
     }
 
     @Override
@@ -61,10 +95,16 @@ public class RefreshLayout extends LinearLayout {
         super.onSizeChanged(w, h, oldw, oldh);
         View headView = getChildAt(0);
         mHeadViewHeight = headView.getMeasuredHeight();
-        Log.e("sunday","headViewHeight = " + mHeadViewHeight );
-        scrollTo(0,mHeadViewHeight);
+        maxPullHeight = mHeadViewHeight;
+        Log.e("sunday", "headViewHeight = " + mHeadViewHeight);
+        scrollTo(0, mHeadViewHeight);
     }
 
+    public void setMaxPullHeight(int height) {
+        if(height > mHeadViewHeight) {
+            maxPullHeight = height;
+        }
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -77,8 +117,8 @@ public class RefreshLayout extends LinearLayout {
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        switch (event.getAction()){
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mScroller.abortAnimation();
                 mLastX = event.getX();
@@ -86,31 +126,66 @@ public class RefreshLayout extends LinearLayout {
                 break;
             case MotionEvent.ACTION_MOVE:
                 float moveY = event.getY() - mLastY;
-                Log.e("sunday","moveY = " + moveY);
-                Log.e("sunday","getScrollY() = " + getScrollY());
-                if(isChildTop() && moveY > 0) {
-                    scrollBy(0, (int) -moveY);
-                }else if(moveY < 0 ){
-                    if(isChildBottom() || getScrollY() < mHeadViewHeight) {
+                if (isChildTop() && moveY > 0) {
+                    //scrollBy(0, (int) -moveY);
+                    return true;
+                } else if (moveY < 0) {
+                    if (isChildBottom() || getScrollY() < mHeadViewHeight) {
+                        //scrollBy(0, (int) -moveY);
+                        return true;
+                    }
+                }
+
+        }
+        return super.onInterceptTouchEvent(event);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mScroller.abortAnimation();
+                mLastX = event.getX();
+                mLastY = event.getY();
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                float moveY = event.getY() - mLastY;
+                if (isChildTop() && moveY > 0) {
+                    float move = getScrollValue(moveY);
+                    Log.e("sunday","move = " + move);
+                    if(move != 0) {
+                        scrollBy(0, (int) -move);
+                    }
+                } else if (moveY < 0) {
+                    if (isChildBottom() || getScrollY() < mHeadViewHeight) {
                         scrollBy(0, (int) -moveY);
                     }
                 }
                 mLastY = event.getY();
-                break;
+                return true;
+
             case MotionEvent.ACTION_UP:
-                if(isChildTop() || isChildBottom()) {
-                    mScroller.startScroll(0, getScrollY(), 0, mHeadViewHeight - getScrollY(), 1000);
-                    postInvalidate();
+                if (isRefreshStatus()) {
+                    if (mRefreshListener != null) {
+                        mScroller.startScroll(0, getScrollY(), 0, -getScrollY(), 500);
+                        postInvalidate();
+                        mRefreshListener.refresh();
+                    }
+                } else if (isLoadMoreStatus()) {
+                    if (mRefreshListener != null) {
+                        mRefreshListener.loadMore();
+                    }
                 }
                 break;
         }
-        return super.dispatchTouchEvent(event);
+        return super.onTouchEvent(event);
     }
+
 
 
     @Override
     public void scrollTo(int x, int y) {
-        if(y > mHeadViewHeight){
+        if (y > mHeadViewHeight) {
             y = mHeadViewHeight;
         }
         super.scrollTo(x, y);
@@ -118,10 +193,45 @@ public class RefreshLayout extends LinearLayout {
 
     @Override
     public void computeScroll() {
-        if(mScroller.computeScrollOffset()){
-            Log.e("sunday","mScroller.getCurrY() = " + mScroller.getCurrY() );
-            scrollTo(0,mScroller.getCurrY());
+        if (mScroller.computeScrollOffset() && !mScroller.isFinished()) {
+            scrollTo(0, mScroller.getCurrY());
+            postInvalidate();
+        }
+
+    }
+
+    public void finishRefresh(boolean success) {
+        if (getScrollY() >= 0) {
+            mScroller.startScroll(
+                    0,
+                    getScrollY(),
+                    0,
+                    (isRefreshStatus() ? mHeadViewHeight : mRootViewHeight),
+                    1000);
             postInvalidate();
         }
     }
+
+    public boolean isSupportFullPull() {
+        return isFullPull;
+    }
+
+    private void setFullPull(boolean isFullPull) {
+        this.isFullPull = isFullPull;
+    }
+
+    private float getScrollValue(float moveY) {
+
+        //刷新
+        if (isSupportFullPull()) {
+            return moveY / 3;
+        } else {
+            if (getScrollY() > 0 || getScrollY() > (mHeadViewHeight-maxPullHeight)) {
+                return moveY / 3;
+            } else {
+                return  0 ;
+            }
+        }
+    }
+
 }

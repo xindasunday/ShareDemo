@@ -1,5 +1,6 @@
 package custom.sunday.com.sharedemo.component.setting;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ListView;
@@ -9,18 +10,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 import custom.sunday.com.sharedemo.R;
+import custom.sunday.com.sharedemo.component.refreshlayout.RefreshLayout;
+import custom.sunday.com.sharedemo.component.refreshlayout.RefreshListener;
 
 public class SettingItemActivity extends AppCompatActivity {
     private FriendDetail mFriendDetail;
     private SettingItemText mNameRemarkSettingItem;
     private SettingItemScreen mSettingItemScreen;
-
+    private RefreshLayout mRefreshLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settingitem);
         //demo使用
         mFriendDetail = new FriendDetail();
+        mRefreshLayout = (RefreshLayout) findViewById(R.id.refresh_layout);
+        mRefreshLayout.setRefreshListener(new RefreshListener() {
+            @Override
+            public void refresh() {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRefreshLayout.finishRefresh(true);
+                    }
+                },2000);
+            }
+
+            @Override
+            public void loadMore() {
+
+            }
+        });
         ListView listView = (ListView) findViewById(R.id.list_view);
         List<SettingItem> settingItems = new ArrayList<>();
         mNameRemarkSettingItem = new SettingItemText(
