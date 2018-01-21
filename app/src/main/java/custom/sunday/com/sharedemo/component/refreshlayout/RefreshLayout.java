@@ -115,15 +115,11 @@ public class RefreshLayout extends LinearLayout {
     public void setRefreshStatus(boolean status) {
         isRefresh = status;
         isLoadMore = !status;
-        mHeaderView.getView().setVisibility(VISIBLE);
-        mFootView.getView().setVisibility(GONE);
     }
 
     public void setLoadMoreStatus(boolean status) {
         isLoadMore = status;
         isRefresh = !status;
-        mFootView.getView().setVisibility(VISIBLE);
-        mHeaderView.getView().setVisibility(GONE);
     }
 
     @Override
