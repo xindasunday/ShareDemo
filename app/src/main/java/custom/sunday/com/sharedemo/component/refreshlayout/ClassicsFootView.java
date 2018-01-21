@@ -10,11 +10,10 @@ import custom.sunday.com.sharedemo.R;
 import custom.sunday.com.sharedemo.common.view.LoadingView;
 
 /**
- * Created by zhongfei.sun on 2018/1/19.
+ * Created by Administrator on 2018/1/21.
  */
 
-public class ClassicsHeaderView implements HeaderView {
-
+public class ClassicsFootView implements FootView {
     private Context mContext;
     private View mParent;
 
@@ -22,7 +21,7 @@ public class ClassicsHeaderView implements HeaderView {
     private TextView mTextView;
     private ImageView mFinishView;
 
-    public ClassicsHeaderView(Context context){
+    public ClassicsFootView(Context context){
         mContext = context;
     }
 

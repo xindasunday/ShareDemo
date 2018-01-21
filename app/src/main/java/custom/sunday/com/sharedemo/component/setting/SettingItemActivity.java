@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import custom.sunday.com.sharedemo.R;
+import custom.sunday.com.sharedemo.component.refreshlayout.ClassicsFootView;
+import custom.sunday.com.sharedemo.component.refreshlayout.FootView;
 import custom.sunday.com.sharedemo.component.refreshlayout.RefreshLayout;
 import custom.sunday.com.sharedemo.component.refreshlayout.RefreshListener;
 
@@ -25,6 +27,8 @@ public class SettingItemActivity extends AppCompatActivity {
         //demo使用
         mFriendDetail = new FriendDetail();
         mRefreshLayout = (RefreshLayout) findViewById(R.id.refresh_layout);
+        FootView mFootView = new ClassicsFootView(this);
+        mRefreshLayout.setFootView(mFootView);
         mRefreshLayout.setRefreshListener(new RefreshListener() {
             @Override
             public void refresh() {
