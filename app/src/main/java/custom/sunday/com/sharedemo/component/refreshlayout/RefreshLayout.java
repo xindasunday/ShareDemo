@@ -168,7 +168,7 @@ public class RefreshLayout extends LinearLayout {
                 if (isRefreshStatus()) {
                     if (mRefreshListener != null) {
                         if (getScrollY() > 0) {
-                            mHeaderView.normal();
+                            mHeaderView.reset();
                             mScroller.startScroll(0, getScrollY(), 0, mHeadViewHeight, 500);
                             postInvalidate();
                         } else {
@@ -214,7 +214,7 @@ public class RefreshLayout extends LinearLayout {
         if(getScrollY() >= 0) {
             removeCallbacks(finishRunnable);
             mHeaderView.showPause(success);
-            postDelayed(finishRunnable, mHeaderView.getDelayMillsTime());
+            postDelayed(finishRunnable, mHeaderView.getPauseMillTime());
         }
     }
 

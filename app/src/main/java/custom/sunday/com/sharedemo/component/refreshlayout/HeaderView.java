@@ -14,14 +14,14 @@ public interface HeaderView {
     void loading();
 
     //初始化和结束后调用
-    void normal();
+    void reset();
 
     View getView();
 
-    //刷新成功后暂停几秒用于显示动画效果后，执行Runnable
+    //刷新成功后暂停几秒用于显示动画效果后
     void showPause(boolean success);
 
     boolean isPauseTime();
 
-    int getDelayMillsTime();
+    int getPauseMillTime();
 }

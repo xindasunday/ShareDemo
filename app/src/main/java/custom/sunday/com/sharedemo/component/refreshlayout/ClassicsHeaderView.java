@@ -28,7 +28,7 @@ public class ClassicsHeaderView implements HeaderView {
 
     @Override
     public void begin() {
-        normal();
+        reset();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class ClassicsHeaderView implements HeaderView {
     }
 
     @Override
-    public void normal() {
+    public void reset() {
         mLoadingView.setVisibility(View.GONE);
         mFinishView.setVisibility(View.GONE);
         mTextView.setText("下拉刷新");
