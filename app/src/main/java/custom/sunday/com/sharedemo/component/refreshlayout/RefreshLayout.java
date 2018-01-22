@@ -3,12 +3,10 @@ package custom.sunday.com.sharedemo.component.refreshlayout;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.RelativeLayout;
 import android.widget.Scroller;
 
 /**
@@ -68,16 +66,15 @@ public class RefreshLayout extends ViewGroup {
         mRefreshListener = refreshListener;
     }
 
-
-    public void showErrorView(View view){
-        if(mErrorView != null){
+    public void showErrorView(View view) {
+        if (mErrorView != null) {
             removeView(mErrorView);
         }
         mErrorView = view;
         addView(mErrorView);
     }
 
-    public void hideErrorView(){
+    public void hideErrorView() {
         mErrorView.setVisibility(GONE);
     }
 
@@ -151,10 +148,17 @@ public class RefreshLayout extends ViewGroup {
         }
     }
 
+    public void setMaxPushHeight(int height){
+        if(height > mFootViewHeight){
+            maxPushHeight = height;
+        }
+    }
+
+
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        scrollTo(0,mHeadViewHeight);
+        scrollTo(0, mHeadViewHeight);
     }
 
     @Override
@@ -183,12 +187,11 @@ public class RefreshLayout extends ViewGroup {
                     heightMeasureSpec, 0);
 
             final int childHeight = child.getMeasuredHeight();
-            if(child == mHeaderView.getView()){
+            if (mHeaderView != null && child == mHeaderView.getView()) {
                 mHeadViewHeight = childHeight;
-
-            }else if(child == mFootView.getView()){
+            } else if (mFootView != null && child == mFootView.getView()) {
                 mFootViewHeight = childHeight;
-            }else if(mErrorView == child){
+            } else if (mErrorView == child) {
                 //mErrorView覆盖在上面，不计算入高度
                 continue;
             }
@@ -241,12 +244,12 @@ public class RefreshLayout extends ViewGroup {
                 break;
             case MotionEvent.ACTION_MOVE:
                 float moveY = event.getY() - mLastY;
-                if (isChildTop() && moveY > 0) {
+                if (isChildTop() && moveY > 0 && mHeaderView != null) {
                     //scrollBy(0, (int) -moveY);
                     setRefreshStatus(true);
                     mHeaderView.begin();
                     return true;
-                } else if (moveY < 0) {
+                } else if (moveY < 0 && mFootView != null) {
                     if (isChildBottom() || getScrollY() < mHeadViewHeight) {
                         //scrollBy(0, (int) -moveY);
                         setLoadMoreStatus(true);
@@ -269,15 +272,19 @@ public class RefreshLayout extends ViewGroup {
                 return true;
             case MotionEvent.ACTION_MOVE:
                 float moveY = event.getY() - mLastY;
-                //Log.e("sunday","onTouchEvent-moveY = " + moveY);
                 if (isChildTop() && moveY > 0) {
                     float move = getScrollValue(moveY);
-                    mHeaderView.progress(0.5f);
+                    if(mHeaderView != null) {
+                        mHeaderView.progress(0.5f);
+                    }
                     scrollBy(0, (int) -move);
                 } else if (moveY < 0) {
                     if (isChildBottom() || getScrollY() < mHeadViewHeight) {
-                        Log.e("sunday", "scrollBy-  = " + -moveY);
-                        scrollBy(0, (int) -moveY);
+                        float move = getScrollValue(moveY);
+                        if(mFootView != null) {
+                            mFootView.progress(0.5f);
+                        }
+                        scrollBy(0, (int) -move);
                     }
                 }
                 mLastY = event.getY();
@@ -299,10 +306,10 @@ public class RefreshLayout extends ViewGroup {
                     }
                 } else if (isLoadMoreStatus()) {
                     if (mRefreshListener != null) {
-                        if (getScrollY() > mHeadViewHeight + mFootViewHeight) {
+                        if (getScrollY() >= mHeadViewHeight + mFootViewHeight) {
                             mFootView.loading();
                             mRefreshListener.loadMore();
-                            mScroller.startScroll(0, getScrollY(), 0, mFootViewHeight * 2 - getScrollY(), 500);
+                            mScroller.startScroll(0, getScrollY(), 0, mFootViewHeight + mHeadViewHeight - getScrollY(), 500);
                             postInvalidate();
                         } else {
                             mScroller.startScroll(0, getScrollY(), 0, mHeadViewHeight - getScrollY(), 500);
@@ -318,16 +325,21 @@ public class RefreshLayout extends ViewGroup {
 
     @Override
     public void scrollTo(int x, int y) {
-//        if (y > mHeadViewHeight) {
-//            y = mHeadViewHeight;
-//        }
+        if(isRefreshStatus() && !isSupportFullPull()) {
+            if (y > mHeadViewHeight) {
+                y = mHeadViewHeight;
+            }
+        }else if(isLoadMoreStatus() && !isSupportFullPush()){
+            if(y > mHeadViewHeight + mFootViewHeight){
+                y = mHeadViewHeight + mFootViewHeight;
+            }
+        }
         super.scrollTo(x, y);
     }
 
     @Override
     public void computeScroll() {
         if (mScroller.computeScrollOffset() && !mScroller.isFinished()) {
-            Log.e("sunday", "mScroller.getCurrY() = " + mScroller.getCurrY());
             scrollTo(0, mScroller.getCurrY());
             postInvalidate();
         }
@@ -353,11 +365,17 @@ public class RefreshLayout extends ViewGroup {
 
     public void finish() {
         if (getScrollY() >= 0) {
+            int scrollHeight;
+            if(mHeadViewHeight == 0){
+                scrollHeight = 0;
+            }else{
+                scrollHeight = (isRefreshStatus() ? mHeadViewHeight : mFootViewHeight);
+            }
             mScroller.startScroll(
                     0,
                     getScrollY(),
                     0,
-                    (isRefreshStatus() ? mHeadViewHeight : mFootViewHeight - getScrollY()),
+                    scrollHeight - getScrollY(),
                     1000);
             postInvalidate();
         }
@@ -390,24 +408,41 @@ public class RefreshLayout extends ViewGroup {
     }
 
     private float getScrollValue(float moveY) {
-        //刷新
-        if (isSupportFullPull()) {
-            return moveY * mMoveRate;
-        } else {
-            if (getScrollY() > 0 || getScrollY() > (mHeadViewHeight - maxPullHeight)) {
+        if(isRefreshStatus() && mHeaderView != null){
+            if (isSupportFullPull() || getScrollY() > 0 || getScrollY() > (mHeadViewHeight - maxPullHeight)) {
                 return moveY * mMoveRate;
             } else {
+                return 0;
+            }
+        }else{
+            if(isSupportFullPush() || getScrollY() < (Math.max(mHeadViewHeight + mFootViewHeight,maxPushHeight))) {
+                return moveY * mMoveRate;
+            }else{
                 return 0;
             }
         }
     }
 
-    @Override
-    public RefreshLayout.LayoutParams generateLayoutParams(AttributeSet attrs) {
-        return new RefreshLayout.LayoutParams(getContext(),attrs);
+    public void removeHeaderView() {
+        if (mHeaderView != null) {
+            removeView(mHeaderView.getView());
+            mHeaderView = null;
+        }
     }
 
-    public static class LayoutParams extends ViewGroup.MarginLayoutParams{
+    public void removeFootView() {
+        if (mFootView != null) {
+            removeView(mFootView.getView());
+            mFootView = null;
+        }
+    }
+
+    @Override
+    public RefreshLayout.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new RefreshLayout.LayoutParams(getContext(), attrs);
+    }
+
+    public static class LayoutParams extends ViewGroup.MarginLayoutParams {
 
         public LayoutParams(Context c, AttributeSet attrs) {
             super(c, attrs);
