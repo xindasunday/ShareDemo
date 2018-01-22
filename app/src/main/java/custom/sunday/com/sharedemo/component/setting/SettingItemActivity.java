@@ -29,6 +29,7 @@ public class SettingItemActivity extends AppCompatActivity {
         mRefreshLayout = (RefreshLayout) findViewById(R.id.refresh_layout);
         FootView mFootView = new ClassicsFootView(this);
         mRefreshLayout.setFootView(mFootView);
+        mRefreshLayout.setCanLoadMore(false);
         mRefreshLayout.setRefreshListener(new RefreshListener() {
             @Override
             public void refresh() {
