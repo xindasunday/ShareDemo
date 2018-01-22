@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ScrollView;
 import android.widget.Scroller;
 
 import java.util.HashSet;
@@ -185,7 +186,7 @@ public class RefreshLayout extends ViewGroup {
         int count = getChildCount();
         for(int i = 0; i < count; i ++){
             View view = getChildAt(i);
-            if (view instanceof AbsListView) {
+            if (view instanceof AbsListView || view instanceof ScrollView) {
                 mChildCalcList.add(view);
             }
         }
