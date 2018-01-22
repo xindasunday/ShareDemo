@@ -8,8 +8,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
 
@@ -17,7 +15,7 @@ import android.widget.Scroller;
  * Created by zhongfei.sun on 2017/10/20.
  */
 
-public class RefreshLayout extends LinearLayout {
+public class RefreshLayout extends ViewGroup {
 
     private HeaderView mHeaderView;
     private FootView mFootView;
@@ -30,8 +28,21 @@ public class RefreshLayout extends LinearLayout {
     private int maxPullHeight;
     private int maxPushHeight;
     private boolean isFullPull = true;
-    //值越大，滑动速度越慢
-    private float mFiller = 3;
+    private boolean isFullPush = true;
+    //值越小，滑动速度越慢
+    private float mMoveRate = 0.3f;
+    private boolean isRefresh;
+    private boolean isLoadMore;
+    private Runnable finishRunnable = new Runnable() {
+        @Override
+        public void run() {
+            finish();
+        }
+    };
+
+
+    //覆盖全屏幕的错误提示view;
+    private View mErrorView;
 
 
     public RefreshLayout(Context context) {
@@ -50,12 +61,26 @@ public class RefreshLayout extends LinearLayout {
     private void init() {
         mScroller = new Scroller(getContext());
         mHeaderView = new ClassicsHeaderView(getContext());
-        addView(mHeaderView.getView(), 0);
+        setHeadView(mHeaderView);
     }
 
     public void setRefreshListener(RefreshListener refreshListener) {
         mRefreshListener = refreshListener;
     }
+
+
+    public void showErrorView(View view){
+        if(mErrorView != null){
+            removeView(mErrorView);
+        }
+        mErrorView = view;
+        addView(mErrorView);
+    }
+
+    public void hideErrorView(){
+        mErrorView.setVisibility(GONE);
+    }
+
 
     public void setHeadView(HeaderView headerView) {
         mHeaderView = headerView;
@@ -63,7 +88,7 @@ public class RefreshLayout extends LinearLayout {
         if (headerView != null && headerView instanceof HeaderView) {
             removeView(headView);
         }
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-1, -2);
+        RefreshLayout.LayoutParams layoutParams = new LayoutParams(-1, -2);
         this.mHeaderView.getView().setLayoutParams(layoutParams);
         if (this.mHeaderView.getView().getParent() != null) {
             ((ViewGroup) this.mHeaderView.getView().getParent()).removeAllViews();
@@ -71,14 +96,14 @@ public class RefreshLayout extends LinearLayout {
         addView(mHeaderView.getView(), 0);
     }
 
-    public void setFootView(FootView footView){
+    public void setFootView(FootView footView) {
         mFootView = footView;
-        int index = getChildCount() -1;
+        int index = getChildCount() - 1;
         View child = getChildAt(index);
         if (footView != null && child instanceof FootView) {
             removeView(child);
         }
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-1, -2);
+        LayoutParams layoutParams = new LayoutParams(-1, -2);
         mFootView.getView().setLayoutParams(layoutParams);
         if (mFootView.getView().getParent() != null) {
             ((ViewGroup) this.mFootView.getView().getParent()).removeAllViews();
@@ -102,14 +127,8 @@ public class RefreshLayout extends LinearLayout {
         return true;
     }
 
-    private boolean isRefresh;
-    private boolean isLoadMore;
     public boolean isRefreshStatus() {
         return isRefresh;
-    }
-
-    public boolean isLoadMoreStatus() {
-        return isLoadMore;
     }
 
     public void setRefreshStatus(boolean status) {
@@ -117,29 +136,13 @@ public class RefreshLayout extends LinearLayout {
         isLoadMore = !status;
     }
 
+    public boolean isLoadMoreStatus() {
+        return isLoadMore;
+    }
+
     public void setLoadMoreStatus(boolean status) {
         isLoadMore = status;
         isRefresh = !status;
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        View headView = getChildAt(0);
-        if(mHeaderView != null && mHeaderView.getView() == headView) {
-            mHeadViewHeight = headView.getMeasuredHeight();
-            scrollTo(0, mHeadViewHeight);
-        }else{
-            //throw new RuntimeException("headView is error");
-        }
-
-        View footView = getChildAt(getChildCount() - 1);
-        if(mFootView != null && mFootView.getView() == footView){
-            mFootViewHeight = footView.getMeasuredHeight();
-        }else{
-            //throw new RuntimeException("footView is error");
-        }
-
     }
 
     public void setMaxPullHeight(int height) {
@@ -148,6 +151,11 @@ public class RefreshLayout extends LinearLayout {
         }
     }
 
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        scrollTo(0,mHeadViewHeight);
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -163,18 +171,27 @@ public class RefreshLayout extends LinearLayout {
 
         // See how tall everyone is. Also remember max width.
         for (int i = 0; i < count; ++i) {
+
             final View child = getChildAt(i);
 
             if (child.getVisibility() == View.GONE) {
                 continue;
             }
-
             final LayoutParams lp = (LayoutParams) child.getLayoutParams();
             final int usedHeight = mTotalHeight;
             measureChildBeforeLayout(child, i, widthMeasureSpec, 0,
                     heightMeasureSpec, 0);
 
             final int childHeight = child.getMeasuredHeight();
+            if(child == mHeaderView.getView()){
+                mHeadViewHeight = childHeight;
+
+            }else if(child == mFootView.getView()){
+                mFootViewHeight = childHeight;
+            }else if(mErrorView == child){
+                //mErrorView覆盖在上面，不计算入高度
+                continue;
+            }
             final int totalLength = mTotalHeight;
             mTotalHeight = totalLength + childHeight + lp.topMargin +
                     lp.bottomMargin;
@@ -196,7 +213,6 @@ public class RefreshLayout extends LinearLayout {
                 heightMeasureSpec, totalHeight);
     }
 
-
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         //super.onLayout(changed, l, t, r, b);
@@ -205,12 +221,12 @@ public class RefreshLayout extends LinearLayout {
         int right = getPaddingRight();
         int top = getPaddingTop();
         int bottom = getPaddingBottom();
-        for(int i = 0;i < count;i++){
+        for (int i = 0; i < count; i++) {
             View view = getChildAt(i);
             right = getPaddingRight() + view.getMeasuredWidth();
             top = top + view.getPaddingTop();
             bottom = top + view.getMeasuredHeight();
-            view.layout(left,top,right,bottom);
+            view.layout(left, top, right, bottom);
             top = top + view.getMeasuredHeight() + view.getPaddingBottom();
         }
     }
@@ -260,7 +276,7 @@ public class RefreshLayout extends LinearLayout {
                     scrollBy(0, (int) -move);
                 } else if (moveY < 0) {
                     if (isChildBottom() || getScrollY() < mHeadViewHeight) {
-                        Log.e("sunday","scrollBy-  = " + -moveY);
+                        Log.e("sunday", "scrollBy-  = " + -moveY);
                         scrollBy(0, (int) -moveY);
                     }
                 }
@@ -283,7 +299,7 @@ public class RefreshLayout extends LinearLayout {
                     }
                 } else if (isLoadMoreStatus()) {
                     if (mRefreshListener != null) {
-                        if (getScrollY() >  mHeadViewHeight + mFootViewHeight) {
+                        if (getScrollY() > mHeadViewHeight + mFootViewHeight) {
                             mFootView.loading();
                             mRefreshListener.loadMore();
                             mScroller.startScroll(0, getScrollY(), 0, mFootViewHeight * 2 - getScrollY(), 500);
@@ -311,38 +327,43 @@ public class RefreshLayout extends LinearLayout {
     @Override
     public void computeScroll() {
         if (mScroller.computeScrollOffset() && !mScroller.isFinished()) {
-            Log.e("sunday","mScroller.getCurrY() = " + mScroller.getCurrY());
+            Log.e("sunday", "mScroller.getCurrY() = " + mScroller.getCurrY());
             scrollTo(0, mScroller.getCurrY());
             postInvalidate();
         }
 
     }
-    private Runnable finishRunnable =new Runnable() {
-        @Override
-        public void run() {
-            finish();
-        }
-    };
+
     public void finishRefresh(boolean success) {
-        if(getScrollY() >= 0) {
+        if (getScrollY() >= 0) {
             removeCallbacks(finishRunnable);
             mHeaderView.showPause(success);
             postDelayed(finishRunnable, mHeaderView.getPauseMillTime());
         }
     }
 
-    public void finish(){
+    public void finishLoadMore(boolean success) {
+        if (getScrollY() >= 0) {
+            removeCallbacks(finishRunnable);
+            mFootView.showPause(success);
+            postDelayed(finishRunnable, mFootView.getPauseMillTime());
+        }
+    }
+
+
+    public void finish() {
         if (getScrollY() >= 0) {
             mScroller.startScroll(
                     0,
                     getScrollY(),
                     0,
-                    (isRefreshStatus() ? mHeadViewHeight : mFootViewHeight),
+                    (isRefreshStatus() ? mHeadViewHeight : mFootViewHeight - getScrollY()),
                     1000);
             postInvalidate();
         }
     }
 
+    /*允许拉出超过headerview的高度*/
     public boolean isSupportFullPull() {
         return isFullPull;
     }
@@ -351,25 +372,57 @@ public class RefreshLayout extends LinearLayout {
         this.isFullPull = isFullPull;
     }
 
-    public float getMoveFiller() {
-        return mFiller;
+    /*允许拉出超过Footview的高度*/
+    public boolean isSupportFullPush() {
+        return isFullPush;
     }
 
-    public void setMoveFiller(float num) {
-        mFiller = num;
+    private void setFullPush(boolean isFullPush) {
+        this.isFullPush = isFullPush;
+    }
+
+    public float getMoveRate() {
+        return mMoveRate;
+    }
+
+    public void setMoveRate(float num) {
+        mMoveRate = num;
     }
 
     private float getScrollValue(float moveY) {
         //刷新
         if (isSupportFullPull()) {
-            return moveY / mFiller;
+            return moveY * mMoveRate;
         } else {
             if (getScrollY() > 0 || getScrollY() > (mHeadViewHeight - maxPullHeight)) {
-                return moveY / mFiller;
+                return moveY * mMoveRate;
             } else {
                 return 0;
             }
         }
     }
 
+    @Override
+    public RefreshLayout.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        return new RefreshLayout.LayoutParams(getContext(),attrs);
+    }
+
+    public static class LayoutParams extends ViewGroup.MarginLayoutParams{
+
+        public LayoutParams(Context c, AttributeSet attrs) {
+            super(c, attrs);
+        }
+
+        public LayoutParams(int width, int height) {
+            super(width, height);
+        }
+
+        public LayoutParams(MarginLayoutParams source) {
+            super(source);
+        }
+
+        public LayoutParams(ViewGroup.LayoutParams source) {
+            super(source);
+        }
+    }
 }

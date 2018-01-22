@@ -37,7 +37,7 @@ public class ClassicsFootView implements FootView {
 
     @Override
     public void loading() {
-        mTextView.setText("刷新中");
+        mTextView.setText("加载中");
         mLoadingView.setVisibility(View.VISIBLE);
     }
 
@@ -45,7 +45,7 @@ public class ClassicsFootView implements FootView {
     public void reset() {
         mLoadingView.setVisibility(View.GONE);
         mFinishView.setVisibility(View.GONE);
-        mTextView.setText("下拉刷新");
+        mTextView.setText("加载更多");
     }
 
     @Override
@@ -63,7 +63,7 @@ public class ClassicsFootView implements FootView {
     public void showPause(boolean success) {
         mFinishView.setVisibility(View.VISIBLE);
         mLoadingView.setVisibility(View.GONE);
-        mTextView.setText("刷新成功");
+        mTextView.setText("加载成功");
     }
 
     @Override

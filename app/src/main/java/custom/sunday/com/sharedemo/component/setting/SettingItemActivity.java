@@ -43,7 +43,13 @@ public class SettingItemActivity extends AppCompatActivity {
 
             @Override
             public void loadMore() {
-
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mRefreshLayout.finishLoadMore(true);
+                    }
+                },2000);
             }
         });
         ListView listView = (ListView) findViewById(R.id.list_view);
