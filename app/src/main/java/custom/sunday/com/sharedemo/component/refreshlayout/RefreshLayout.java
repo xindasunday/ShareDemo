@@ -2,12 +2,18 @@ package custom.sunday.com.sharedemo.component.refreshlayout;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Scroller;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by zhongfei.sun on 2017/10/20.
@@ -38,6 +44,8 @@ public class RefreshLayout extends ViewGroup {
         }
     };
 
+    private Set<View> mChildCalcList;
+
 
     //覆盖全屏幕的错误提示view;
     private View mErrorView;
@@ -57,6 +65,7 @@ public class RefreshLayout extends ViewGroup {
     }
 
     private void init() {
+        mChildCalcList = new HashSet<>();
         mScroller = new Scroller(getContext());
         mHeaderView = new ClassicsHeaderView(getContext());
         setHeadView(mHeaderView);
@@ -109,19 +118,27 @@ public class RefreshLayout extends ViewGroup {
     }
 
     private boolean isChildTop() {
-        View child = getChildAt(1);
-        if (child instanceof AbsListView) {
-            AbsListView listView = (AbsListView) child;
-            if (listView.getFirstVisiblePosition() == 0) {
-                View topChildView = listView.getChildAt(0);
-                return topChildView.getTop() == 0;
+        Set<View> hashSet = mChildCalcList;
+        Iterator<View> iterator = hashSet.iterator();
+        while (iterator.hasNext()){
+            View child = iterator.next();
+            if(!ViewCompat.canScrollHorizontally(child,-1)){
+                return true;
             }
         }
         return false;
     }
 
     private boolean isChildBottom() {
-        return true;
+        Set<View> hashSet = mChildCalcList;
+        Iterator<View> iterator = hashSet.iterator();
+        while (iterator.hasNext()){
+            View child = iterator.next();
+            if(!ViewCompat.canScrollHorizontally(child,1)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isRefreshStatus() {
@@ -154,6 +171,25 @@ public class RefreshLayout extends ViewGroup {
         }
     }
 
+    public void addChildNeedCalc(View child){
+        mChildCalcList.add(child);
+    }
+
+    public void removeChildNeedCalc(View child){
+        mChildCalcList.remove(child);
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        int count = getChildCount();
+        for(int i = 0; i < count; i ++){
+            View view = getChildAt(i);
+            if (view instanceof AbsListView) {
+                mChildCalcList.add(view);
+            }
+        }
+    }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
