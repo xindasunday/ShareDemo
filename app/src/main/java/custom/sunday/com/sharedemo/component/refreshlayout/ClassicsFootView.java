@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import custom.sunday.com.sharedemo.R;
-import custom.sunday.com.sharedemo.common.view.LoadingView;
+
 
 /**
  * Created by Administrator on 2018/1/21.
@@ -18,7 +18,6 @@ public class ClassicsFootView implements FootView {
     private Context mContext;
     private View mParent;
 
-    private LoadingView mLoadingView;
     private TextView mTextView;
     private ImageView mFinishView;
 
@@ -43,12 +42,10 @@ public class ClassicsFootView implements FootView {
     @Override
     public void loading() {
         mTextView.setText("加载中");
-        mLoadingView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void reset() {
-        mLoadingView.setVisibility(View.GONE);
         mFinishView.setVisibility(View.GONE);
         mTextView.setText("加载更多");
     }
@@ -58,7 +55,6 @@ public class ClassicsFootView implements FootView {
         if(mParent == null){
             mParent = LayoutInflater.from(mContext).inflate(R.layout.layout_head_classics,null,false);
             mTextView = (TextView) mParent.findViewById(R.id.text);
-            mLoadingView = (LoadingView) mParent.findViewById(R.id.loading);
             mFinishView = (ImageView) mParent.findViewById(R.id.finish);
         }
         return mParent;
@@ -67,7 +63,6 @@ public class ClassicsFootView implements FootView {
     @Override
     public void showPause(boolean success) {
         mFinishView.setVisibility(View.VISIBLE);
-        mLoadingView.setVisibility(View.GONE);
         mTextView.setText("加载成功");
     }
 
@@ -78,6 +73,6 @@ public class ClassicsFootView implements FootView {
 
     @Override
     public int getPauseMillTime() {
-        return 2000;
+        return 0;
     }
 }

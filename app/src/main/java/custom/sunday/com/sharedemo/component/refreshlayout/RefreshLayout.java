@@ -5,7 +5,6 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,16 +30,33 @@ public class RefreshLayout extends ViewGroup {
     private int mFootViewHeight;
     private Scroller mScroller;
     private RefreshListener mRefreshListener;
-    private int maxPullHeight;
-    private int maxPushHeight;
+    //是否可以拉动超出HeaderView的高度
     private boolean isFullPull = true;
+    //是否可以拉动超出FooterView的高度
     private boolean isFullPush = true;
-    //值越小，滑动速度越慢
+    //把HeaderView拉出的最大高度，isFullPull = true时 生效
+    private int maxPullHeight;
+    //把FooterView拉出的最大高度，isFullPush = true时 生效
+    private int maxPushHeight;
+    //滑动差值，值越小，滑动速度越慢
     private float mMoveRate = 0.3f;
+    //headerView或者footerView 在可全屏滑动下，松手后滑动进入刷新/加载状态的时间
+    private int mOutRangeScrollTime = 800;
+    //headerView或者footerView 在刷新/加载结束后，隐藏的滑动时间
+    public int hideHeadFootViewTime = 800;//ms
+    //是否处于刷新状态
     private boolean isRefresh;
+    //是否处于加载状态
     private boolean isLoadMore;
+    //是否允许刷新
     private boolean isCanRefresh = true;
+    //是否允许加载
     private boolean isCanLoadMore = true;
+    //用于计算子View是否到底/到顶，轻松解决嵌套/组合 可滑动控件
+    private Set<View> mChildCalcList;
+    //覆盖mBaseView的错误提示view;
+    private View mErrorView;
+    private View mBaseView;
     private Runnable finishRunnable = new Runnable() {
         @Override
         public void run() {
@@ -48,12 +64,7 @@ public class RefreshLayout extends ViewGroup {
         }
     };
 
-    private Set<View> mChildCalcList;
 
-
-    //覆盖mBaseView的错误提示view;
-    private View mErrorView;
-    private View mBaseView;
 
     public RefreshLayout(Context context) {
         this(context, null);
@@ -87,24 +98,30 @@ public class RefreshLayout extends ViewGroup {
      * @param baseView 被覆盖的view
      */
     public void showErrorView(View view, View baseView) {
-        if (mErrorView != null) {
-            removeView(mErrorView);
+        if(mErrorView == view){
+            mErrorView.setVisibility(VISIBLE);
+        }else {
+            if (mErrorView != null) {
+                removeView(mErrorView);
+            }
+            mBaseView = baseView;
+            mErrorView = view;
+            LayoutParams layoutParams = new LayoutParams(-1, -1);
+            mErrorView.setLayoutParams(layoutParams);
+            addView(mErrorView);
         }
-        mBaseView = baseView;
-        mErrorView = view;
-        LayoutParams layoutParams = new LayoutParams(-1, -1);
-        mErrorView.setLayoutParams(layoutParams);
-        addView(mErrorView);
     }
 
     public void hideErrorView() {
-        mErrorView.setVisibility(GONE);
+        if (mErrorView != null) {
+            mErrorView.setVisibility(GONE);
+        }
     }
 
     public void setHeadView(HeaderView headerView) {
         mHeaderView = headerView;
         View headView = getChildAt(0);
-        if (headerView != null && headerView instanceof HeaderView) {
+        if (headView != null && headView instanceof HeaderView) {
             removeView(headView);
         }
         RefreshLayout.LayoutParams layoutParams = new LayoutParams(-1, -2);
@@ -135,11 +152,11 @@ public class RefreshLayout extends ViewGroup {
         Iterator<View> iterator = hashSet.iterator();
         while (iterator.hasNext()) {
             View child = iterator.next();
-            if (!ViewCompat.canScrollVertically(child, -1)) {
-                return true;
+            if (ViewCompat.canScrollVertically(child, -1)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     private boolean isChildBottom() {
@@ -147,11 +164,11 @@ public class RefreshLayout extends ViewGroup {
         Iterator<View> iterator = hashSet.iterator();
         while (iterator.hasNext()) {
             View child = iterator.next();
-            if (!ViewCompat.canScrollVertically(child, 1)) {
-                return true;
+            if (ViewCompat.canScrollVertically(child, 1)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public boolean isRefreshStatus() {
@@ -275,9 +292,11 @@ public class RefreshLayout extends ViewGroup {
         int bottom = getPaddingBottom();
         for (int i = 0; i < count; i++) {
             View view = getChildAt(i);
-            right = getPaddingRight() + view.getMeasuredWidth();
-            top = top + view.getPaddingTop();
-            bottom = top + view.getMeasuredHeight();
+            LayoutParams layoutParams = (LayoutParams) view.getLayoutParams();
+            left = getPaddingLeft() + layoutParams.leftMargin;
+            right = getPaddingRight() + view.getMeasuredWidth() + layoutParams.rightMargin;
+            top = top + view.getPaddingTop() + layoutParams.topMargin;
+            bottom = top + view.getMeasuredHeight() + layoutParams.bottomMargin;
             view.layout(left, top, right, bottom);
             top = top + view.getMeasuredHeight() + view.getPaddingBottom();
             if (view == mErrorView) {
@@ -290,12 +309,12 @@ public class RefreshLayout extends ViewGroup {
                 rect.left = 0;
                 rect.right = mErrorView.getMeasuredWidth();
                 rect.top = mHeadViewHeight;
-                rect.bottom = mErrorView.getMeasuredHeight();
+                rect.bottom = rect.top + mErrorView.getMeasuredHeight();
             } else {
                 rect.left = mBaseView.getLeft();
-                rect.right = mErrorView.getMeasuredWidth();
+                rect.right = rect.left + mErrorView.getMeasuredWidth();
                 rect.top = mBaseView.getTop();
-                rect.bottom = mErrorView.getMeasuredHeight();
+                rect.bottom = rect.top + mErrorView.getMeasuredHeight();
             }
             mErrorView.layout(rect.left, rect.top, rect.right, rect.bottom);
         }
@@ -306,14 +325,14 @@ public class RefreshLayout extends ViewGroup {
     public boolean onInterceptTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                mScroller.abortAnimation();
+
                 mLastX = event.getX();
                 mLastY = event.getY();
                 break;
             case MotionEvent.ACTION_MOVE:
                 float moveY = event.getY() - mLastY;
                 if (isChildTop() && moveY > 0 && isCanRefresh()) {
-                    //scrollBy(0, (int) -moveY);
+                    mScroller.abortAnimation();
                     setRefreshStatus(true);
                     mHeaderView.begin();
                     if(mFootView != null){
@@ -322,7 +341,7 @@ public class RefreshLayout extends ViewGroup {
                     return true;
                 } else if (moveY < 0 && isCanLoadMore()) {
                     if (isChildBottom() || getScrollY() < mHeadViewHeight) {
-                        //scrollBy(0, (int) -moveY);
+                        mScroller.abortAnimation();
                         setLoadMoreStatus(true);
                         mFootView.begin();
                         if(mHeaderView != null){
@@ -342,27 +361,36 @@ public class RefreshLayout extends ViewGroup {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 mScroller.abortAnimation();
+                restoreStatus();
                 mLastX = event.getX();
                 mLastY = event.getY();
                 return true;
             case MotionEvent.ACTION_MOVE:
                 float moveY = event.getY() - mLastY;
                 float move = getScrollValue(moveY);
-                if(isRefreshStatus()){
-                        float progress;
-                        if (getScrollY() > 0) {
-                            progress = (mHeadViewHeight - getScrollY()) / (float) mHeadViewHeight;
-                        } else {
-                            progress = (Math.abs(getScrollY()) + mHeadViewHeight) / (float) mHeadViewHeight;
-                        }
-                        mHeaderView.progress(progress);
-                }else{
-                        float progress = (getScrollY() - mHeadViewHeight)/(float)mFootViewHeight;
-                        if (mFootView != null) {
-                            mFootView.progress(progress);
-                        }
+                if (isUnknownStatus()) {
+                    //如果直接Touch在RefreshLayout则不会走onInterceptTouchEvent，
+                    // 所以需要调用一下onInterceptTouchEvent去判断是下拉还是上拉
+                    onInterceptTouchEvent(event);
                 }
-                scrollBy(0, (int) -move);
+
+                if (isRefreshStatus()) {
+                    float progress;
+                    if (getScrollY() > 0) {
+                        progress = (mHeadViewHeight - getScrollY()) / (float) mHeadViewHeight;
+                    } else {
+                        progress = (Math.abs(getScrollY()) + mHeadViewHeight) / (float) mHeadViewHeight;
+                    }
+                    mHeaderView.progress(progress);
+                    scrollBy(0, (int) -move);
+                } else if (isCanLoadMore()) {
+                    float progress = (getScrollY() - mHeadViewHeight) / (float) mFootViewHeight;
+                    if (mFootView != null) {
+                        mFootView.progress(progress);
+                    }
+                    scrollBy(0, (int) -move);
+                }
+
                 mLastY = event.getY();
                 return true;
 
@@ -371,10 +399,10 @@ public class RefreshLayout extends ViewGroup {
                     if (mRefreshListener != null) {
                         if (getScrollY() > 0) {
                             mHeaderView.reset();
-                            mScroller.startScroll(0, getScrollY(), 0, mHeadViewHeight - getScrollY(), 500);
+                            mScroller.startScroll(0, getScrollY(), 0, mHeadViewHeight - getScrollY(), mOutRangeScrollTime);
                             postInvalidate();
                         } else {
-                            mScroller.startScroll(0, getScrollY(), 0, -getScrollY(), 500);
+                            mScroller.startScroll(0, getScrollY(), 0, -getScrollY(), mOutRangeScrollTime);
                             postInvalidate();
                             mHeaderView.loading();
                             mRefreshListener.refresh();
@@ -385,10 +413,10 @@ public class RefreshLayout extends ViewGroup {
                         if (getScrollY() >= mHeadViewHeight + mFootViewHeight) {
                             mFootView.loading();
                             mRefreshListener.loadMore();
-                            mScroller.startScroll(0, getScrollY(), 0, mFootViewHeight + mHeadViewHeight - getScrollY(), 500);
+                            mScroller.startScroll(0, getScrollY(), 0, mFootViewHeight + mHeadViewHeight - getScrollY(), mOutRangeScrollTime);
                             postInvalidate();
                         } else {
-                            mScroller.startScroll(0, getScrollY(), 0, mHeadViewHeight - getScrollY(), 500);
+                            mScroller.startScroll(0, getScrollY(), 0, mHeadViewHeight - getScrollY(), mOutRangeScrollTime);
                             postInvalidate();
 
                         }
@@ -422,8 +450,24 @@ public class RefreshLayout extends ViewGroup {
 
     }
 
+    public boolean isUnknownStatus() {
+        if (isRefreshStatus()) {
+            return false;
+        } else if (isLoadMoreStatus()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public void restoreStatus() {
+        setRefreshStatus(false);
+        setLoadMoreStatus(false);
+    }
+
     public void finishRefresh(boolean success) {
-        if (getScrollY() >= 0) {
+        if (isUnknownStatus()) {
+        } else {
             removeCallbacks(finishRunnable);
             mHeaderView.showPause(success);
             postDelayed(finishRunnable, mHeaderView.getPauseMillTime());
@@ -431,30 +475,52 @@ public class RefreshLayout extends ViewGroup {
     }
 
     public void finishLoadMore(boolean success) {
-        if (getScrollY() >= 0) {
+        if (isUnknownStatus()) {
+        } else {
             removeCallbacks(finishRunnable);
             mFootView.showPause(success);
             postDelayed(finishRunnable, mFootView.getPauseMillTime());
         }
     }
 
+    public int getOutRangeScrollTime() {
+        return mOutRangeScrollTime;
+    }
+
+    /**
+     * headerView或者footerView 在可全屏滑动下，松手后滑动进入刷新/加载状态的时间
+     **/
+    public void setOutRangeScrollTime(int millTime) {
+        mOutRangeScrollTime = millTime;
+    }
+
+    public int getHideHeadFootViewMillTime() {
+        return hideHeadFootViewTime;
+    }
+
+    /**
+     * headerView或者footerView 在刷新/加载结束后，隐藏的滑动时间
+     */
+    public void setHideHeadFootViewMillTime(int millTime) {
+        hideHeadFootViewTime = millTime;
+    }
 
     public void finish() {
-        if (getScrollY() >= 0) {
-            int scrollHeight;
-            if (mHeadViewHeight == 0) {
-                scrollHeight = 0;
-            } else {
-                scrollHeight = (isRefreshStatus() ? mHeadViewHeight : mFootViewHeight);
-            }
-            mScroller.startScroll(
-                    0,
-                    getScrollY(),
-                    0,
-                    scrollHeight - getScrollY(),
-                    1000);
-            postInvalidate();
+        mScroller.abortAnimation();
+        int scrollHeight;
+        if (mHeadViewHeight == 0) {
+            scrollHeight = 0;
+        } else {
+            scrollHeight = (isRefreshStatus() ? mHeadViewHeight : mFootViewHeight);
         }
+
+        mScroller.startScroll(
+                0,
+                getScrollY(),
+                0,
+                scrollHeight - getScrollY(),
+                hideHeadFootViewTime);
+        postInvalidate();
     }
 
     /*允许拉出超过headerview的高度*/
