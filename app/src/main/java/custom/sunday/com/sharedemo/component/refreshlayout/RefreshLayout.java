@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -315,12 +316,18 @@ public class RefreshLayout extends ViewGroup {
                     //scrollBy(0, (int) -moveY);
                     setRefreshStatus(true);
                     mHeaderView.begin();
+                    if(mFootView != null){
+                        mFootView.reset();
+                    }
                     return true;
                 } else if (moveY < 0 && isCanLoadMore()) {
                     if (isChildBottom() || getScrollY() < mHeadViewHeight) {
                         //scrollBy(0, (int) -moveY);
                         setLoadMoreStatus(true);
                         mFootView.begin();
+                        if(mHeaderView != null){
+                            mHeaderView.reset();
+                        }
                         return true;
                     }
                 }
@@ -340,28 +347,22 @@ public class RefreshLayout extends ViewGroup {
                 return true;
             case MotionEvent.ACTION_MOVE:
                 float moveY = event.getY() - mLastY;
-                if (isChildTop() && moveY > 0) {
-                    float move = getScrollValue(moveY);
-                    if (mHeaderView != null) {
+                float move = getScrollValue(moveY);
+                if(isRefreshStatus()){
                         float progress;
-                        if(getScrollY() > 0){
-                            progress = (mHeadViewHeight - getScrollY())/(float)mHeadViewHeight;
-                        }else {
+                        if (getScrollY() > 0) {
+                            progress = (mHeadViewHeight - getScrollY()) / (float) mHeadViewHeight;
+                        } else {
                             progress = (Math.abs(getScrollY()) + mHeadViewHeight) / (float) mHeadViewHeight;
                         }
                         mHeaderView.progress(progress);
-                    }
-                    scrollBy(0, (int) -move);
-                } else if (moveY < 0) {
-                    if (isChildBottom() || getScrollY() < mHeadViewHeight) {
-                        float move = getScrollValue(moveY);
+                }else{
                         float progress = (getScrollY() - mHeadViewHeight)/(float)mFootViewHeight;
                         if (mFootView != null) {
                             mFootView.progress(progress);
                         }
-                        scrollBy(0, (int) -move);
-                    }
                 }
+                scrollBy(0, (int) -move);
                 mLastY = event.getY();
                 return true;
 

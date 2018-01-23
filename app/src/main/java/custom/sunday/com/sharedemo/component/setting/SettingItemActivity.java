@@ -40,7 +40,7 @@ public class SettingItemActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mRefreshLayout.finishRefresh(false);
+                        mRefreshLayout.finishRefresh(true);
                         mRefreshLayout.showErrorView(mErrorView);
                     }
                 },2000);
