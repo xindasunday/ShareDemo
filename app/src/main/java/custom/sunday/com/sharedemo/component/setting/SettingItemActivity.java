@@ -2,6 +2,7 @@ package custom.sunday.com.sharedemo.component.setting;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -20,6 +21,8 @@ public class SettingItemActivity extends AppCompatActivity {
     private SettingItemText mNameRemarkSettingItem;
     private SettingItemScreen mSettingItemScreen;
     private RefreshLayout mRefreshLayout;
+    private View mErrorView;
+    private ListView mListView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +32,7 @@ public class SettingItemActivity extends AppCompatActivity {
         mRefreshLayout = (RefreshLayout) findViewById(R.id.refresh_layout);
         FootView mFootView = new ClassicsFootView(this);
         mRefreshLayout.setFootView(mFootView);
-        mRefreshLayout.setCanLoadMore(false);
+        mErrorView = LayoutInflater.from(this).inflate(R.layout.layout_network_error,null,false);
         mRefreshLayout.setRefreshListener(new RefreshListener() {
             @Override
             public void refresh() {
@@ -37,7 +40,8 @@ public class SettingItemActivity extends AppCompatActivity {
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mRefreshLayout.finishRefresh(true);
+                        mRefreshLayout.finishRefresh(false);
+                        mRefreshLayout.showErrorView(mErrorView);
                     }
                 },2000);
             }
@@ -53,7 +57,7 @@ public class SettingItemActivity extends AppCompatActivity {
                 },2000);
             }
         });
-        ListView listView = (ListView) findViewById(R.id.list_view);
+        mListView = (ListView) findViewById(R.id.list_view);
         List<SettingItem> settingItems = new ArrayList<>();
         mNameRemarkSettingItem = new SettingItemText(
                 "设置备注",
@@ -115,7 +119,7 @@ public class SettingItemActivity extends AppCompatActivity {
                 }
             }
         });
-        mSettingItemScreen = new SettingItemScreen(listView, settingItems);
+        mSettingItemScreen = new SettingItemScreen(mListView, settingItems);
     }
 
     @Override

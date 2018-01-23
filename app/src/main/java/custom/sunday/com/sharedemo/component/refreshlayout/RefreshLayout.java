@@ -1,6 +1,7 @@
 package custom.sunday.com.sharedemo.component.refreshlayout;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -13,7 +14,6 @@ import android.widget.Scroller;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -50,9 +50,9 @@ public class RefreshLayout extends ViewGroup {
     private Set<View> mChildCalcList;
 
 
-    //覆盖全屏幕的错误提示view;
+    //覆盖mBaseView的错误提示view;
     private View mErrorView;
-
+    private View mBaseView;
 
     public RefreshLayout(Context context) {
         this(context, null);
@@ -78,11 +78,21 @@ public class RefreshLayout extends ViewGroup {
         mRefreshListener = refreshListener;
     }
 
-    public void showErrorView(View view) {
+    public void showErrorView(View view){
+        showErrorView(view,null);
+    }
+    /**
+     * @param view 需要显示的view
+     * @param baseView 被覆盖的view
+     */
+    public void showErrorView(View view, View baseView) {
         if (mErrorView != null) {
             removeView(mErrorView);
         }
+        mBaseView = baseView;
         mErrorView = view;
+        LayoutParams layoutParams = new LayoutParams(-1, -1);
+        mErrorView.setLayoutParams(layoutParams);
         addView(mErrorView);
     }
 
@@ -125,7 +135,7 @@ public class RefreshLayout extends ViewGroup {
         Iterator<View> iterator = hashSet.iterator();
         while (iterator.hasNext()) {
             View child = iterator.next();
-            if (!ViewCompat.canScrollHorizontally(child, -1)) {
+            if (!ViewCompat.canScrollVertically(child, -1)) {
                 return true;
             }
         }
@@ -137,7 +147,7 @@ public class RefreshLayout extends ViewGroup {
         Iterator<View> iterator = hashSet.iterator();
         while (iterator.hasNext()) {
             View child = iterator.next();
-            if (!ViewCompat.canScrollHorizontally(child, 1)) {
+            if (!ViewCompat.canScrollVertically(child, 1)) {
                 return true;
             }
         }
@@ -270,7 +280,26 @@ public class RefreshLayout extends ViewGroup {
             bottom = top + view.getMeasuredHeight();
             view.layout(left, top, right, bottom);
             top = top + view.getMeasuredHeight() + view.getPaddingBottom();
+            if (view == mErrorView) {
+                continue;
+            }
         }
+        if (mErrorView != null) {
+            Rect rect = new Rect();
+            if (mBaseView == null) {
+                rect.left = 0;
+                rect.right = mErrorView.getMeasuredWidth();
+                rect.top = mHeadViewHeight;
+                rect.bottom = mErrorView.getMeasuredHeight();
+            } else {
+                rect.left = mBaseView.getLeft();
+                rect.right = mErrorView.getMeasuredWidth();
+                rect.top = mBaseView.getTop();
+                rect.bottom = mErrorView.getMeasuredHeight();
+            }
+            mErrorView.layout(rect.left, rect.top, rect.right, rect.bottom);
+        }
+
     }
 
     @Override

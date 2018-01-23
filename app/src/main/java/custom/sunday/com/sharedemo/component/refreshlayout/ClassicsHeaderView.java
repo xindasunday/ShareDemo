@@ -64,7 +64,11 @@ public class ClassicsHeaderView implements HeaderView {
     public void showPause(boolean success) {
         mFinishView.setVisibility(View.VISIBLE);
         mLoadingView.setVisibility(View.GONE);
-        mTextView.setText("刷新成功");
+        if(success) {
+            mTextView.setText("刷新成功");
+        }else{
+            mTextView.setText("刷新失败");
+        }
     }
 
     @Override
