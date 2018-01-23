@@ -35,7 +35,6 @@ public class ClassicsHeaderView implements HeaderView {
 
     @Override
     public void progress(float progress) {
-        Log.e("sunday","progress = " + progress);
         if(progress >= 1f){
             mTextView.setText("松开刷新");
         }else{
