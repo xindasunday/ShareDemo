@@ -100,7 +100,6 @@ public class RefreshLayout extends ViewGroup {
         mErrorView.setVisibility(GONE);
     }
 
-
     public void setHeadView(HeaderView headerView) {
         mHeaderView = headerView;
         View headView = getChildAt(0);
@@ -344,14 +343,21 @@ public class RefreshLayout extends ViewGroup {
                 if (isChildTop() && moveY > 0) {
                     float move = getScrollValue(moveY);
                     if (mHeaderView != null) {
-                        mHeaderView.progress(0.5f);
+                        float progress;
+                        if(getScrollY() > 0){
+                            progress = (mHeadViewHeight - getScrollY())/(float)mHeadViewHeight;
+                        }else {
+                            progress = (Math.abs(getScrollY()) + mHeadViewHeight) / (float) mHeadViewHeight;
+                        }
+                        mHeaderView.progress(progress);
                     }
                     scrollBy(0, (int) -move);
                 } else if (moveY < 0) {
                     if (isChildBottom() || getScrollY() < mHeadViewHeight) {
                         float move = getScrollValue(moveY);
+                        float progress = (getScrollY() - mHeadViewHeight)/(float)mFootViewHeight;
                         if (mFootView != null) {
-                            mFootView.progress(0.5f);
+                            mFootView.progress(progress);
                         }
                         scrollBy(0, (int) -move);
                     }

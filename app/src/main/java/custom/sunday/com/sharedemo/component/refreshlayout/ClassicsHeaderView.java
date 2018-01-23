@@ -1,6 +1,8 @@
 package custom.sunday.com.sharedemo.component.refreshlayout;
 
 import android.content.Context;
+import android.graphics.Path;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,7 +35,12 @@ public class ClassicsHeaderView implements HeaderView {
 
     @Override
     public void progress(float progress) {
-
+        Log.e("sunday","progress = " + progress);
+        if(progress >= 1f){
+            mTextView.setText("松开刷新");
+        }else{
+            mTextView.setText("下拉刷新");
+        }
     }
 
     @Override

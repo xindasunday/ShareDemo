@@ -9,6 +9,9 @@ import android.view.View;
 public interface HeaderView {
     void begin();
 
+    /**
+     * 相对于HeaderView高度的倍数
+     * **/
     void progress(float progress);
 
     void loading();

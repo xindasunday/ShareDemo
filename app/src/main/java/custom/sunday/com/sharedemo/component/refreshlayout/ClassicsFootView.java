@@ -1,6 +1,7 @@
 package custom.sunday.com.sharedemo.component.refreshlayout;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -32,7 +33,11 @@ public class ClassicsFootView implements FootView {
 
     @Override
     public void progress(float progress) {
-
+        if(progress >= 1f){
+            mTextView.setText("松开加载更多");
+        }else{
+            mTextView.setText("上拉加载更多");
+        }
     }
 
     @Override
