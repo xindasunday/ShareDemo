@@ -78,6 +78,6 @@ public class ClassicsHeaderView implements HeaderView {
 
     @Override
     public long getPauseMillTime() {
-        return 0;
+        return 200;
     }
 }

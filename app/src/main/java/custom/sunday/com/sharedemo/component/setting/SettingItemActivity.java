@@ -15,6 +15,7 @@ import custom.sunday.com.sharedemo.component.refreshlayout.ClassicsFootView;
 import custom.sunday.com.sharedemo.component.refreshlayout.FootView;
 import custom.sunday.com.sharedemo.component.refreshlayout.RefreshLayout;
 import custom.sunday.com.sharedemo.component.refreshlayout.RefreshListener;
+import custom.sunday.com.sharedemo.component.refreshlayout.RotateHeaderView;
 
 public class SettingItemActivity extends AppCompatActivity {
     private FriendDetail mFriendDetail;
@@ -32,7 +33,9 @@ public class SettingItemActivity extends AppCompatActivity {
         mRefreshLayout = (RefreshLayout) findViewById(R.id.refresh_layout);
         FootView mFootView = new ClassicsFootView(this);
         mRefreshLayout.setFootView(mFootView);
-        mErrorView = LayoutInflater.from(this).inflate(R.layout.layout_network_error,null,false);
+
+        mRefreshLayout.setHeadView(new RotateHeaderView(this));
+        //mErrorView = LayoutInflater.from(this).inflate(R.layout.layout_network_error,null,false);
         mRefreshLayout.setRefreshListener(new RefreshListener() {
             @Override
             public void refresh() {
@@ -41,7 +44,7 @@ public class SettingItemActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         mRefreshLayout.finishRefresh(true);
-                        mRefreshLayout.showErrorView(mErrorView);
+                        //mRefreshLayout.showErrorView(mErrorView);
                     }
                 },2000);
             }

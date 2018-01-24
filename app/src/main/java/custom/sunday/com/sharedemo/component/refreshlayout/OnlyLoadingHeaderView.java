@@ -1,18 +1,17 @@
-package com.phicomm.waterglass.common.refresh;
+package custom.sunday.com.sharedemo.component.refreshlayout;
 
 import android.content.Context;
 import android.support.annotation.IntDef;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.phicomm.waterglass.R;
-import com.phicomm.waterglass.common.views.LoadingView;
-import com.phicomm.waterglass.common.views.RotateAnimatorToY;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import custom.sunday.com.sharedemo.R;
+import custom.sunday.com.sharedemo.common.view.LoadingView;
+
 
 /**
  * Created by zhongfei.sun on 2018/1/24.

@@ -73,6 +73,6 @@ public class ClassicsFootView implements FootView {
 
     @Override
     public long getPauseMillTime() {
-        return 0;
+        return 200;
     }
 }

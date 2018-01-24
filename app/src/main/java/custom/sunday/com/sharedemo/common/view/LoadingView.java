@@ -65,4 +65,15 @@ public class LoadingView extends View {
         super.onDetachedFromWindow();
         removeCallbacks(runnable);
     }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        //super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        if(bitmap != null){
+            setMeasuredDimension(bitmap.getWidth(),bitmap.getHeight());
+        }else{
+            setMeasuredDimension(0,0);
+        }
+
+    }
 }

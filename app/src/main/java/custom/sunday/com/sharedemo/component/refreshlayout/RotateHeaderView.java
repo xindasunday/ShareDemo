@@ -1,18 +1,20 @@
-package com.phicomm.waterglass.common.refresh;
+package custom.sunday.com.sharedemo.component.refreshlayout;
 
 import android.content.Context;
 import android.support.annotation.IntDef;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.phicomm.waterglass.R;
-import com.phicomm.waterglass.common.views.LoadingView;
-import com.phicomm.waterglass.common.views.RotateAnimatorToY;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import custom.sunday.com.sharedemo.R;
+import custom.sunday.com.sharedemo.common.view.LoadingView;
+import custom.sunday.com.sharedemo.common.view.RotateAnimatorToY;
+
 
 /**
  * Created by zhongfei.sun on 2018/1/24.
@@ -21,6 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 public class RotateHeaderView implements HeaderView {
     public static final int WHITE = 0;
     public static final int BLUE = 1;
+    public static final int DURATION = 2000;
     private Context mContext;
     private View mParent;
     private LoadingView mLoadingView;
@@ -32,6 +35,7 @@ public class RotateHeaderView implements HeaderView {
     public RotateHeaderView(Context context) {
         mContext = context;
         mYAnimation = new RotateAnimatorToY();
+        mYAnimation.setDuration(DURATION);
     }
 
     @Override
@@ -84,7 +88,7 @@ public class RotateHeaderView implements HeaderView {
         } else {
             mFinishView.setImageResource(R.mipmap.connected_blue);
             mLoadingView.setLoadingBitmap(R.mipmap.loading_blue);
-            mTextView.setTextColor(mContext.getResources().getColor(R.color.phicomm_func_mine_bg));
+            mTextView.setTextColor(mContext.getResources().getColor(R.color.blue));
         }
     }
 
@@ -110,7 +114,7 @@ public class RotateHeaderView implements HeaderView {
     @Override
     public long getPauseMillTime() {
         if (isSuccess) {
-            return mYAnimation.getDuration();
+            return mFinishView.getAnimation().getDuration();
         } else {
             return 0;
         }
