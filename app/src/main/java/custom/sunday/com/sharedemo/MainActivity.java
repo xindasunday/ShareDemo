@@ -12,15 +12,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import custom.sunday.com.sharedemo.component.path.PathActivity;
+import custom.sunday.com.sharedemo.component.refreshlayout.RefreshActivity;
 import custom.sunday.com.sharedemo.component.setting.SettingItemActivity;
 
 public class MainActivity extends AppCompatActivity {
     public static final String[] TITLE_ARRAY= {
             "SharePreference管理",
-            "Path"};
+            "Path",
+            "RefreshLayout下拉刷新"};
     public static final Class[] CLASS_ARRAY = {
             SettingItemActivity.class,
-            PathActivity.class
+            PathActivity.class,
+            RefreshActivity.class
     };
 
 

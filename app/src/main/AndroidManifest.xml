@@ -21,6 +21,7 @@
         <activity android:name=".base.BaseActivity" />
         <activity android:name=".component.setting.SettingItemActivity" />
         <activity android:name=".component.path.PathActivity" />
+        <activity android:name=".component.refreshlayout.RefreshActivity"/>
     </application>
 
 </manifest>
