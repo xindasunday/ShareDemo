@@ -26,5 +26,5 @@ public interface HeaderView {
 
     boolean isPauseTime();
 
-    int getPauseMillTime();
+    long getPauseMillTime();
 }

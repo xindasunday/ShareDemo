@@ -47,7 +47,7 @@ public class ClassicsHeaderView implements HeaderView {
 
     @Override
     public void reset() {
-        mFinishView.setVisibility(View.GONE);
+        mFinishView.setVisibility(View.INVISIBLE);
         mTextView.setText("下拉刷新");
     }
 
@@ -77,7 +77,7 @@ public class ClassicsHeaderView implements HeaderView {
     }
 
     @Override
-    public int getPauseMillTime() {
+    public long getPauseMillTime() {
         return 0;
     }
 }

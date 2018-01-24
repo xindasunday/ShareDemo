@@ -46,7 +46,7 @@ public class ClassicsFootView implements FootView {
 
     @Override
     public void reset() {
-        mFinishView.setVisibility(View.GONE);
+        mFinishView.setVisibility(View.INVISIBLE);
         mTextView.setText("加载更多");
     }
 
@@ -72,7 +72,7 @@ public class ClassicsFootView implements FootView {
     }
 
     @Override
-    public int getPauseMillTime() {
+    public long getPauseMillTime() {
         return 0;
     }
 }

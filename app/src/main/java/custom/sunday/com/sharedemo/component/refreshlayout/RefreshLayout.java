@@ -119,26 +119,26 @@ public class RefreshLayout extends ViewGroup {
     }
 
     public void setHeadView(HeaderView headerView) {
-        mHeaderView = headerView;
         View headView = getChildAt(0);
-        if (headView != null && headView instanceof HeaderView) {
+        if (mHeaderView != null && headView == mHeaderView.getView()) {
             removeView(headView);
         }
+        mHeaderView = headerView;
         RefreshLayout.LayoutParams layoutParams = new LayoutParams(-1, -2);
-        this.mHeaderView.getView().setLayoutParams(layoutParams);
-        if (this.mHeaderView.getView().getParent() != null) {
-            ((ViewGroup) this.mHeaderView.getView().getParent()).removeAllViews();
+        mHeaderView.getView().setLayoutParams(layoutParams);
+        if (mHeaderView.getView().getParent() != null) {
+            ((ViewGroup) mHeaderView.getView().getParent()).removeAllViews();
         }
         addView(mHeaderView.getView(), 0);
     }
 
     public void setFootView(FootView footView) {
-        mFootView = footView;
         int index = getChildCount() - 1;
         View child = getChildAt(index);
-        if (footView != null && child instanceof FootView) {
+        if (mFootView != null && child == mFootView.getView()) {
             removeView(child);
         }
+        mFootView = footView;
         LayoutParams layoutParams = new LayoutParams(-1, -2);
         mFootView.getView().setLayoutParams(layoutParams);
         if (mFootView.getView().getParent() != null) {
@@ -461,8 +461,8 @@ public class RefreshLayout extends ViewGroup {
     }
 
     public void restoreStatus() {
-        setRefreshStatus(false);
-        setLoadMoreStatus(false);
+        isRefresh = false;
+        isLoadMore = false;
     }
 
     public void finishRefresh(boolean success) {
