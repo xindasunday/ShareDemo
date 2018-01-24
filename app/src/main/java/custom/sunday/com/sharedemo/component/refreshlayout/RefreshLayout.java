@@ -507,18 +507,11 @@ public class RefreshLayout extends ViewGroup {
 
     public void finish() {
         mScroller.abortAnimation();
-        int scrollHeight;
-        if (mHeadViewHeight == 0) {
-            scrollHeight = 0;
-        } else {
-            scrollHeight = (isRefreshStatus() ? mHeadViewHeight : mFootViewHeight);
-        }
-
         mScroller.startScroll(
                 0,
                 getScrollY(),
                 0,
-                scrollHeight - getScrollY(),
+                mHeadViewHeight - getScrollY(),
                 hideHeadFootViewTime);
         postInvalidate();
     }
