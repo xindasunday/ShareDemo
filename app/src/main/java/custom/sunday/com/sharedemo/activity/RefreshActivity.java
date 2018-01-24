@@ -1,4 +1,4 @@
-package custom.sunday.com.sharedemo.component.refreshlayout;
+package custom.sunday.com.sharedemo.activity;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,12 +8,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import custom.sunday.com.sharedemo.R;
 import custom.sunday.com.sharedemo.base.BaseActivity;
+import custom.sunday.com.sharedemo.component.refreshlayout.ClassicsFootView;
+import custom.sunday.com.sharedemo.component.refreshlayout.OnlyLoadingHeaderView;
+import custom.sunday.com.sharedemo.component.refreshlayout.RefreshLayout;
+import custom.sunday.com.sharedemo.component.refreshlayout.RefreshListener;
+import custom.sunday.com.sharedemo.component.refreshlayout.RotateHeaderView;
 
 /**
  * Created by zhongfei.sun on 2018/1/24.
@@ -24,7 +30,8 @@ public class RefreshActivity extends BaseActivity{
     private ListView mListView;
     public static final String[] OP = {
             "RotateHeaderView,下拉看效果",
-            "OnlyLoadingHeaderView,下拉看效果"};
+            "OnlyLoadingHeaderView,下拉看效果",
+            "经典FooterView,上拉看效果"};
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +69,9 @@ public class RefreshActivity extends BaseActivity{
                     case 1:
                         mRefreshLayout.setHeadView(new OnlyLoadingHeaderView(getBaseContext()));
                         break;
+                    case 2:
+                        mRefreshLayout.setFootView(new ClassicsFootView(getBaseContext()));
+                        break;
                 }
                 Toast.makeText(getBaseContext(),"修改成功",Toast.LENGTH_SHORT).show();
             }
@@ -94,6 +104,32 @@ public class RefreshActivity extends BaseActivity{
                 Holder holder = (Holder) view.getTag();
                 holder.textView.setText(OP[position]);
                 return view;
+            }
+        });
+        final Button pullFull = (Button) findViewById(R.id.full_pull);
+        pullFull.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mRefreshLayout.isSupportFullPull()){
+                    mRefreshLayout.setFullPull(false);
+                    pullFull.setText("下拉只能滑到headerView显示(加载也可调整)");
+                }else{
+                    mRefreshLayout.setFullPull(true);
+                    pullFull.setText("下拉可以全屏滑动(加载也可调整)");
+                }
+            }
+        });
+        final Button pullRate = (Button) findViewById(R.id.pull_rate);
+        pullRate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mRefreshLayout.getMoveRate() < 1f){
+                    mRefreshLayout.setMoveRate(1f);
+                    pullRate.setText("android默认滑动速度1f-值越大越快，默认0.3f");
+                }else{
+                    pullRate.setText("RefreshLayout默认滑动速度0.3f");
+                    mRefreshLayout.setMoveRate(0.3f);
+                }
             }
         });
     }

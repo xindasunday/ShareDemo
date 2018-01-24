@@ -528,7 +528,7 @@ public class RefreshLayout extends ViewGroup {
         return isFullPull;
     }
 
-    private void setFullPull(boolean isFullPull) {
+    public void setFullPull(boolean isFullPull) {
         this.isFullPull = isFullPull;
     }
 
@@ -537,7 +537,7 @@ public class RefreshLayout extends ViewGroup {
         return isFullPush;
     }
 
-    private void setFullPush(boolean isFullPush) {
+    public void setFullPush(boolean isFullPush) {
         this.isFullPush = isFullPush;
     }
 

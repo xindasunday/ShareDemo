@@ -10,7 +10,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -19,9 +19,9 @@
         </activity>
 
         <activity android:name=".base.BaseActivity" />
-        <activity android:name=".component.setting.SettingItemActivity" />
-        <activity android:name=".component.path.PathActivity" />
-        <activity android:name=".component.refreshlayout.RefreshActivity"/>
+        <activity android:name=".activity.SettingItemActivity" />
+        <activity android:name=".activity.PathActivity" />
+        <activity android:name=".activity.RefreshActivity"/>
     </application>
 
 </manifest>

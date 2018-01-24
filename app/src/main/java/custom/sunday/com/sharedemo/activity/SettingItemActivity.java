@@ -1,8 +1,7 @@
-package custom.sunday.com.sharedemo.component.setting;
+package custom.sunday.com.sharedemo.activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -16,6 +15,12 @@ import custom.sunday.com.sharedemo.component.refreshlayout.FootView;
 import custom.sunday.com.sharedemo.component.refreshlayout.RefreshLayout;
 import custom.sunday.com.sharedemo.component.refreshlayout.RefreshListener;
 import custom.sunday.com.sharedemo.component.refreshlayout.RotateHeaderView;
+import custom.sunday.com.sharedemo.component.setting.FriendDetail;
+import custom.sunday.com.sharedemo.component.setting.SettingItem;
+import custom.sunday.com.sharedemo.component.setting.SettingItemScreen;
+import custom.sunday.com.sharedemo.component.setting.SettingItemSwitch;
+import custom.sunday.com.sharedemo.component.setting.SettingItemText;
+import custom.sunday.com.sharedemo.component.setting.SettingKeyValue;
 
 public class SettingItemActivity extends AppCompatActivity {
     private FriendDetail mFriendDetail;
