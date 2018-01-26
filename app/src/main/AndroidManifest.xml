@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="custom.sunday.com.sharedemo">
 
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".HomeApplication"
         android:allowBackup="true"
@@ -22,6 +25,7 @@
         <activity android:name=".activity.SettingItemActivity" />
         <activity android:name=".activity.PathActivity" />
         <activity android:name=".activity.RefreshActivity"/>
+        <activity android:name=".activity.ObjectBoxActivity"/>
     </application>
 
 </manifest>

@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'io.objectbox' // after applying Android plugin
 android {
     compileSdkVersion 25
     buildToolsVersion "26.0.0"
@@ -28,4 +28,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'org.jetbrains:annotations-java5:15.0'
+    compile 'io.objectbox:objectbox-rxjava:0.9.8'
+    debugCompile 'io.objectbox:objectbox-android-objectbrowser:1.2.0'
 }

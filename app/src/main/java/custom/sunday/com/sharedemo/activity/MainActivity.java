@@ -18,11 +18,13 @@ public class MainActivity extends AppCompatActivity {
     public static final String[] TITLE_ARRAY= {
             "SharePreference管理",
             "Path",
-            "RefreshLayout下拉刷新"};
+            "RefreshLayout下拉刷新",
+            "ObjectBox数据库"};
     public static final Class[] CLASS_ARRAY = {
             SettingItemActivity.class,
             PathActivity.class,
-            RefreshActivity.class
+            RefreshActivity.class,
+            ObjectBoxActivity.class
     };
 
 
