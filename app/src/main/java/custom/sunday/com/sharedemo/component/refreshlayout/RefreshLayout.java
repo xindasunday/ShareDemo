@@ -383,7 +383,7 @@ public class RefreshLayout extends ViewGroup {
                     }
                     mHeaderView.progress(progress);
                     scrollBy(0, (int) -move);
-                } else if (isCanLoadMore()) {
+                } else if (isLoadMoreStatus()) {
                     float progress = (getScrollY() - mHeadViewHeight) / (float) mFootViewHeight;
                     if (mFootView != null) {
                         mFootView.progress(progress);
