@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PathSmoothLineView">
+        <attr name="path_height" format="dimension" />
+        <attr name="path_padding_left" format="dimension" />
+        <attr name="path_padding_right" format="dimension" />
+        <attr name="axis_x_padding_left" format="dimension" />
+        <attr name="axis_x_padding_right" format="dimension" />
+        <attr name="axis_y_padding_left" format="dimension" />
+        <attr name="axis_y_padding_right" format="dimension" />
+        <attr name="text_size" format="dimension" />
+        <attr name="text_color" format="dimension" />
+        <attr name="point_cycle_radius" format="dimension" />
+        <attr name="cycle_radius" format="dimension" />
+        <attr name="cycle_point_margin" format="dimension" />
+        <attr name="cycle_text_size" format="dimension" />
+    </declare-styleable>
+
+</resources>

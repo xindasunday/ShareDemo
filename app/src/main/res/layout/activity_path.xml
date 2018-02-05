@@ -7,9 +7,29 @@
     tools:context="custom.sunday.com.sharedemo.activity.MainActivity">
 
 
-    <custom.sunday.com.sharedemo.component.path.PathLineView
-        android:layout_centerInParent="true"
-        android:layout_width="200dp"
-        android:layout_height="200dp" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <custom.sunday.com.sharedemo.component.path.PathLineView
+                android:layout_width="200dp"
+                android:layout_height="200dp" />
+
+
+            <custom.sunday.com.sharedemo.component.path.PathSmoothLineView
+                android:id="@+id/path_smooth_line"
+                android:layout_width="match_parent"
+                android:layout_height="200dp" />
+        </LinearLayout>
+
+
+    </ScrollView>
+
 
 </RelativeLayout>
