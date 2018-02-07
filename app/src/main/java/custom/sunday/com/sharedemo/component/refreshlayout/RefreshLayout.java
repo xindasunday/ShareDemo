@@ -612,4 +612,20 @@ public class RefreshLayout extends ViewGroup {
             super(source);
         }
     }
+
+
+    @Override
+    protected void onWindowVisibilityChanged(int visibility) {
+        super.onWindowVisibilityChanged(visibility);
+        if(visibility == GONE) {
+            restoreStatus();
+            if (mHeaderView != null) {
+                mHeaderView.reset();
+            }
+
+            if (mFootView != null) {
+                mFootView.reset();
+            }
+        }
+    }
 }
