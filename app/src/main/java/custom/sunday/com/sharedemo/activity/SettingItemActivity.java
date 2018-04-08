@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import custom.sunday.com.sharedemo.R;
-import custom.sunday.com.sharedemo.component.refreshlayout.ClassicsFootView;
-import custom.sunday.com.sharedemo.component.refreshlayout.FootView;
-import custom.sunday.com.sharedemo.component.refreshlayout.RefreshLayout;
-import custom.sunday.com.sharedemo.component.refreshlayout.RefreshListener;
-import custom.sunday.com.sharedemo.component.refreshlayout.RotateHeaderView;
 import custom.sunday.com.sharedemo.component.setting.FriendDetail;
 import custom.sunday.com.sharedemo.component.setting.SettingItem;
 import custom.sunday.com.sharedemo.component.setting.SettingItemScreen;
 import custom.sunday.com.sharedemo.component.setting.SettingItemSwitch;
 import custom.sunday.com.sharedemo.component.setting.SettingItemText;
 import custom.sunday.com.sharedemo.component.setting.SettingKeyValue;
+import sunday.com.easyrefreshlayout.ClassicsFootView;
+import sunday.com.easyrefreshlayout.FootView;
+import sunday.com.easyrefreshlayout.RefreshLayout;
+import sunday.com.easyrefreshlayout.RefreshListener;
+import sunday.com.easyrefreshlayout.RotateHeaderView;
 
 public class SettingItemActivity extends AppCompatActivity {
     private FriendDetail mFriendDetail;

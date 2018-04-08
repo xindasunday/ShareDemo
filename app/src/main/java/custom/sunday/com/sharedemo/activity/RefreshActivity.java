@@ -15,11 +15,12 @@ import android.widget.Toast;
 
 import custom.sunday.com.sharedemo.R;
 import custom.sunday.com.sharedemo.base.BaseActivity;
-import custom.sunday.com.sharedemo.component.refreshlayout.ClassicsFootView;
-import custom.sunday.com.sharedemo.component.refreshlayout.OnlyLoadingHeaderView;
-import custom.sunday.com.sharedemo.component.refreshlayout.RefreshLayout;
-import custom.sunday.com.sharedemo.component.refreshlayout.RefreshListener;
-import custom.sunday.com.sharedemo.component.refreshlayout.RotateHeaderView;
+import sunday.com.easyrefreshlayout.ClassicsFootView;
+import sunday.com.easyrefreshlayout.OnlyLoadingHeaderView;
+import sunday.com.easyrefreshlayout.RefreshLayout;
+import sunday.com.easyrefreshlayout.RefreshListener;
+import sunday.com.easyrefreshlayout.RotateHeaderView;
+
 
 /**
  * Created by zhongfei.sun on 2018/1/24.

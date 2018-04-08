@@ -19,6 +19,7 @@ allprojects {
         jcenter()
         repositories {
             maven { url "http://objectbox.net/beta-repo/" }
+            maven { url 'https://www.jitpack.io' }
         }
     }
 }
